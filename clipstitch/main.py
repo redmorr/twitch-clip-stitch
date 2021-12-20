@@ -1,3 +1,4 @@
-from detectoverlap import display_overlapping
+import detectoverlap
 
-display_overlapping('../input/single-stream-all-clips')
+# display_overlapping('../input/single-stream-all-clips')
+detectoverlap.display_overlapping_by_framehash('../input/single-stream-all-clips')

@@ -10,7 +10,7 @@ class Clip:
     def __init__(self, path):
         self.path = path
         self.start_timestamp = os.path.getmtime(path)
-        self.duration = ffmpeg.get_duration(path)
+        self.duration = 1  # ffmpeg.get_duration(path) # Should be resolved only when required / lazy
         self.end_timestamp = self.start_timestamp + self.duration
 
     def __str__(self):
@@ -24,8 +24,8 @@ def color_generator():
         yield Fore.GREEN
 
 
-def display_overlapping(clips_path):
-    clips = [Clip(path) for path in sorted(Path(clips_path).iterdir(), key=os.path.getmtime)]
+def display_overlapping_by_date(clips_path):
+    clips = [Clip(path.resolve()) for path in sorted(Path(clips_path).iterdir(), key=os.path.getmtime)]
     color_cycler = color_generator()
     color = next(color_cycler)
     is_overlapping = False
@@ -47,3 +47,12 @@ def display_overlapping(clips_path):
         print(color + str(clips[-1]) + Style.RESET_ALL)
     else:
         print(str(clips[-1]))
+
+
+def display_overlapping_by_framehash(clips_path):
+    clips = [Clip(path.resolve()) for path in sorted(Path(clips_path).iterdir(), key=os.path.getmtime)]
+    for clip in clips:
+        meta, frames = ffmpeg.framehash(clip.path)
+        print(meta)
+        print(frames)
+        break
