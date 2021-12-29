@@ -21,7 +21,7 @@ framehash_frames_mock = b'0,       -522,          0,      256,   179740, 1b6e4aa
                         b'0,        522,       1797,      256,    17666, ead7c6bd8468e061a8331114235dc675\n' \
                         b'0,        783,       1290,      256,     2149, 6aedb10b2740984e3166d1d603339a3e\n' \
                         b'0,       1029,       1029,      256,      780, 7ee02308641cd2f9601a64811352c66e\n' \
-                        b'0,       1290,       1551,      256,     1033, cf1111b989079ca1e840ff0b35fb00c0'
+                        b'0,       1290,       1551,      256,     1033, cf1111b989079ca1e840ff0b35fb00c0\n'
 
 
 def test_get_duration_file_exists(mocker):
@@ -48,7 +48,7 @@ def test_get_framehashes_frames(mocker):
     mocker.patch('subprocess.check_output', return_value=framehash_metadata_mock + b'\n' + framehash_frames_mock)
     _, expected_frames = ffmpeg.framehash('file_that_exists.mp4')
     assert expected_frames == [[word.strip() for word in framehash_line.decode('UTF_8').split(',')]
-                               for framehash_line in framehash_frames_mock.split(b'\n')]
+                               for framehash_line in framehash_frames_mock.split(b'\n') if framehash_line]
 
 
 def test_get_framehashes_file_doesnt_exist(mocker):

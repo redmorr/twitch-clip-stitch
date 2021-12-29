@@ -38,7 +38,8 @@ def framehash(video_filename):
             metadata.append(meta_line.decode(UTF_8_ENCODING))
 
         for framehash_line in binary_strings[frames_begin_index:]:
-            framehashes.append([word.strip() for word in framehash_line.decode(UTF_8_ENCODING).split(',')])
+            if framehash_line:
+                framehashes.append([word.strip() for word in framehash_line.decode(UTF_8_ENCODING).split(',')])
 
         return metadata, framehashes
     else:
