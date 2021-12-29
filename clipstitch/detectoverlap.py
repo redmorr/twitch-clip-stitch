@@ -6,12 +6,28 @@ from datetime import datetime
 from pathlib import Path
 
 
+class Frame:
+    def __init__(self, stream, dts, pts, duration, size, framehash):
+        self.stream = stream
+        self.dts = dts
+        self.pts = pts
+        self.duration = duration
+        self.size = size
+        self.framehash = framehash
+
+    # For now we assume framehash is an ID
+    def __eq__(self, other):
+        return self.framehash == other.framehash
+
+
 class Clip:
     def __init__(self, path):
         self.path = path
         self.start_timestamp = os.path.getmtime(path)
         self.duration = 0
         self.end_timestamp = 0
+        self.metadata = {}
+        self.frames = []
 
     def __str__(self):
         return "{:<30}  {}  {}".format(self.path.name, datetime.fromtimestamp(self.start_timestamp),
@@ -20,6 +36,12 @@ class Clip:
     def calculate_duration(self):
         self.duration = ffmpeg.get_duration(self.path)
         self.end_timestamp = self.start_timestamp + self.duration
+
+    def init_frames(self):
+        clip_metadata, clip_frames = ffmpeg.framehash(self.path)
+        self.metadata = clip_metadata
+        self.frames = [Frame(*frame_details) for frame_details in clip_frames]
+
 
 
 def color_generator():
@@ -57,8 +79,14 @@ def display_overlapping_by_date(clips_path):
 
 def display_overlapping_by_framehash(clips_path):
     clips = [Clip(path.resolve()) for path in sorted(Path(clips_path).iterdir(), key=os.path.getmtime)]
-    for clip in clips:
-        meta, frames = ffmpeg.framehash(clip.path)
-        print(meta)
-        print(frames)
-        break
+    prev_clip = clips[0]
+    prev_clip.init_frames()
+
+
+    for clip in clips[1:]:
+        clip.init_frames()
+        if any(f in prev_clip.frames for f in clip.frames):
+            print(clip.path)
+            break
+        prev_clip = clip
+
