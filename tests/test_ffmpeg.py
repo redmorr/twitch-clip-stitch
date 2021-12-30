@@ -39,14 +39,14 @@ def test_get_duration_file_doesnt_exist(mocker):
 def test_get_framehashes_metadata(mocker):
     mocker.patch('os.path.isfile', return_value=True)
     mocker.patch('subprocess.check_output', return_value=framehash_metadata_mock + b'\n' + framehash_frames_mock)
-    expected_metadata, _ = ffmpeg.framehash('file_that_exists.mp4')
+    expected_metadata, _ = ffmpeg.framehash_muxer('file_that_exists.mp4')
     assert expected_metadata == [meta_line.decode('UTF-8') for meta_line in framehash_metadata_mock.split(b'\n')]
 
 
 def test_get_framehashes_frames(mocker):
     mocker.patch('os.path.isfile', return_value=True)
     mocker.patch('subprocess.check_output', return_value=framehash_metadata_mock + b'\n' + framehash_frames_mock)
-    _, expected_frames = ffmpeg.framehash('file_that_exists.mp4')
+    _, expected_frames = ffmpeg.framehash_muxer('file_that_exists.mp4')
     assert expected_frames == [[word.strip() for word in framehash_line.decode('UTF_8').split(',')]
                                for framehash_line in framehash_frames_mock.split(b'\n') if framehash_line]
 
@@ -54,4 +54,4 @@ def test_get_framehashes_frames(mocker):
 def test_get_framehashes_file_doesnt_exist(mocker):
     mocker.patch('os.path.isfile', return_value=False)
     with pytest.raises(FileNotFoundError):
-        ffmpeg.framehash('file_that_doesnt_exist')
+        ffmpeg.framehash_muxer('file_that_doesnt_exist')

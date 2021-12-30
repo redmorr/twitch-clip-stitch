@@ -40,13 +40,10 @@ def display_overlapping_by_date(clips_path):
 def display_overlapping_by_framehash(clips_path):
     clips = [Clip(path.resolve()) for path in sorted(Path(clips_path).iterdir(), key=os.path.getmtime)]
     prev_clip = clips[0]
-    prev_clip.init_frames()
 
 
     for clip in clips[1:]:
-        clip.init_frames()
-        if any(f in prev_clip._frames for f in clip._frames):
+        if any(f in prev_clip.frames for f in clip.frames):
             print(clip.path)
             break
         prev_clip = clip
-

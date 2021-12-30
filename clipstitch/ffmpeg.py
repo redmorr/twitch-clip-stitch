@@ -21,7 +21,7 @@ def get_duration(video_filename):
         raise FileNotFoundError('File "{}" does not exist or is not a file'.format(video_filename))
 
 
-def framehash(video_filename):
+def framehash_muxer(video_filename):
     if os.path.isfile(video_filename):
         result = subprocess.check_output(
             [ExecType.ffmpeg.value, '-hide_banner', '-i', video_filename, '-an', '-f', 'framemd5', '-codec', 'copy',
