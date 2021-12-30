@@ -9,7 +9,9 @@ from clipstitch.frame import Frame
 class Clip:
     def __init__(self, path):
         self.path = path
+        self.name = path.name
         self.start_timestamp = os.path.getmtime(path)
+        self.next_intersecting_clips = []
 
     @cached_property
     def duration(self):
@@ -36,3 +38,6 @@ class Clip:
     def __str__(self):
         return "{:<30}  {}  {}".format(self.path.name, datetime.fromtimestamp(self.start_timestamp),
                                        datetime.fromtimestamp(self.end_timestamp))
+
+    def __repr__(self):
+        return self.name
