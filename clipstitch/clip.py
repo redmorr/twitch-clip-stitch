@@ -22,17 +22,21 @@ class Clip:
         return self.start_timestamp + self.duration
 
     @cached_property
-    def _framehash(self):
+    def _framehash_mux(self):
         return ffmpeg.framehash_muxer(self.path)
 
     @cached_property
     def frames(self):
-        _, frames = self._framehash
+        _, frames = self._framehash_mux
         return [Frame(*frame_details) for frame_details in frames]
 
     @cached_property
+    def framehashes(self):
+        return [frame.hash for frame in self.frames]
+
+    @cached_property
     def metadata(self):
-        meta, _ = self._framehash
+        meta, _ = self._framehash_mux
         return meta
 
     def __str__(self):
