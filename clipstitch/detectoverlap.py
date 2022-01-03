@@ -91,6 +91,8 @@ def find_seamless_clip_chains(clips):
     for chain_clips in clip_chains:
         print(chain_clips)
 
+    return clip_chains
+
 
 def traverse_overlapping_clips(clip, clip_series):
     if clip not in clip_series:
