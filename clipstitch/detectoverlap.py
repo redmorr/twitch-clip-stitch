@@ -1,10 +1,10 @@
-import concurrent.futures
 import os
 
 from colorama import Fore, Style
 from pathlib import Path
 
 from clipstitch.clip import Clip
+import itertools
 
 TIME_ACCOUTING_FOR_ERROR = 60
 
@@ -61,7 +61,6 @@ def display_all_clips_overlapping_clip_by_frames(clips_path):
                 f.write(' '.join([c.name for c in clip.next_intersecting_clips]))
                 f.write('\n')
     else:
-        clip_overlap_info = []
         with open('../data/res.txt', 'r') as f:
             for line in f.readlines():
                 words = line.split()
@@ -74,6 +73,31 @@ def display_all_clips_overlapping_clip_by_frames(clips_path):
         print(c.name, end='')
         print(c.next_intersecting_clips)
 
+    return clips
+
+
+def find_seamless_clip_chains(clips):
+    i = 0
+    clip_chains = []
+
+    for clip in clips:
+        if clip in list(itertools.chain(*clip_chains)):
+            continue
+        if clip.next_intersecting_clips:
+            chain = [clip]
+            clip_chains.append(chain)
+            traverse_overlapping_clips(clip, chain)
+
+    for chain_clips in clip_chains:
+        print(chain_clips)
+
+
+def traverse_overlapping_clips(clip, clip_series):
+    if clip not in clip_series:
+        clip_series.append(clip)
+    if clip.next_intersecting_clips:
+        for c in clip.next_intersecting_clips:
+            traverse_overlapping_clips(c, clip_series)
 
 
 def display_all_clips_overlapping_clip_by_timestamp(clips_path):

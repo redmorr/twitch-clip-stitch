@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from functools import cached_property
 
 from clipstitch import ffmpeg
@@ -40,8 +39,7 @@ class Clip:
         return meta
 
     def __str__(self):
-        return "{:<30}  {}  {}".format(self.path.name, datetime.fromtimestamp(self.start_timestamp),
-                                       datetime.fromtimestamp(self.end_timestamp))
+        return self.name
 
     def __repr__(self):
         return self.name
