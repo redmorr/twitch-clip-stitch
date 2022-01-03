@@ -42,19 +42,38 @@ def display_overlapping_by_date(clips_path):
 
 def display_all_clips_overlapping_clip_by_frames(clips_path):
     clips = [Clip(path.resolve()) for path in sorted(Path(clips_path).iterdir(), key=os.path.getmtime)]
-    clips_count = len(clips)
 
-    for i, clip in enumerate(clips):
-        print(i)
-        if i + 1 < clips_count:
-            for next_clip in clips[i + 1:]:
-                if any(fhash in next_clip.framehashes for fhash in clip.framehashes):
-                    print("Ding!")
-                    clip.next_intersecting_clips.append(next_clip)
+    if not os.path.isfile('../data/res.txt'):
+        clips_count = len(clips)
 
-    for clip in clips:
-        print(clip.name, end='')
-        print(clip.next_intersecting_clips)
+        for i, clip in enumerate(clips):
+            print(i)
+            if i + 1 < clips_count:
+                for next_clip in clips[i + 1:]:
+                    if any(fhash in next_clip.framehashes for fhash in clip.framehashes):
+                        print("Ding!")
+                        clip.next_intersecting_clips.append(next_clip)
+
+        with open('../data/res.txt', 'w') as f:
+            for clip in clips:
+                f.write(clip.name)
+                f.write(' ')
+                f.write(' '.join([c.name for c in clip.next_intersecting_clips]))
+                f.write('\n')
+    else:
+        clip_overlap_info = []
+        with open('../data/res.txt', 'r') as f:
+            for line in f.readlines():
+                words = line.split()
+                if len(words) <= 1:
+                    continue
+                first_clip = [c for c in clips if c.name == words[0]][0]
+                first_clip.next_intersecting_clips = [c for c in clips if c.name in words[1:]]
+
+    for c in clips:
+        print(c.name, end='')
+        print(c.next_intersecting_clips)
+
 
 
 def display_all_clips_overlapping_clip_by_timestamp(clips_path):
