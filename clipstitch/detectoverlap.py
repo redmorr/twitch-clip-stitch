@@ -44,15 +44,18 @@ def display_all_clips_overlapping_clip_by_frames(clips_path):
     clips = [Clip(path.resolve()) for path in sorted(Path(clips_path).iterdir(), key=os.path.getmtime)]
 
     if not os.path.isfile('../data/res.txt'):
-        clips_count = len(clips)
-
+        checked = []
         for i, clip in enumerate(clips):
-            print(i)
-            if i + 1 < clips_count:
-                for next_clip in clips[i + 1:]:
-                    if any(fhash in next_clip.framehashes for fhash in clip.framehashes):
-                        print("Ding!")
-                        clip.next_intersecting_clips.append(next_clip)
+            print('{} {}'.format(i, clip))
+            checked.append(clip)
+            for other_clip in [c for c in clips if c not in checked]:
+                if any(fhash in other_clip.framehashes for fhash in clip.framehashes):
+                    if clip.framehashes[0] not in other_clip.framehashes:
+                        print('{} comes before {}'.format(clip, other_clip))
+                        clip.next_intersecting_clips.append(other_clip)
+                    else:
+                        print('{} comes after {}'.format(clip, other_clip))
+                        other_clip.next_intersecting_clips.append(clip)
 
         with open('../data/res.txt', 'w') as f:
             for clip in clips:
