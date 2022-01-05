@@ -79,7 +79,7 @@ def display_all_clips_overlapping_clip_by_frames(clips_path):
     return clips
 
 
-def find_seamless_clip_chains(clips):
+def find_clip_chains(clips):
     i = 0
     clip_chains = []
 
@@ -103,6 +103,18 @@ def traverse_overlapping_clips(clip, clip_series):
     if clip.next_intersecting_clips:
         for c in clip.next_intersecting_clips:
             traverse_overlapping_clips(c, clip_series)
+
+
+def remove_redundant_clips(clip_chains):
+    optimized_clip_chains = []
+    for clip_chain in clip_chains:
+        c = clip_chain[0]
+        new_chain = [c]
+        while c.next_intersecting_clips:
+            c = max(c.next_intersecting_clips, key=lambda x: len(set(x.framehashes) - set(c.framehashes)))
+            new_chain.append(c)
+        optimized_clip_chains.append(new_chain)
+    return optimized_clip_chains
 
 
 def display_all_clips_overlapping_clip_by_timestamp(clips_path):
