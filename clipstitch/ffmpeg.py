@@ -44,3 +44,9 @@ def framehash_muxer(video_filename):
         return metadata, framehashes
     else:
         raise FileNotFoundError('File "{}" does not exist or is not a file'.format(video_filename))
+
+
+def concat_demuxer(input_file, output_file):
+    subprocess.check_output(
+        [ExecType.ffmpeg.value, '-nostats', '-hide_banner', '-avoid_negative_ts', 'make_zero', '-fflags', '+genpts',
+         '-f', 'concat', '-safe', '0', '-i', input_file, '-c', 'copy', '-y', output_file])
